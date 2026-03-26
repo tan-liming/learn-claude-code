@@ -93,5 +93,7 @@ if __name__ == "__main__":
         if query.strip().lower() in quitList:
             print("bye")
             break
+        if query.strip() == "":
+            continue
         history.append({"role": "user", "content": query})
         agent_loop(history)
