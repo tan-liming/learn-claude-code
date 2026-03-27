@@ -112,3 +112,52 @@ TOOLS = [
     {"name": "edit_file", "description": "Replace exact text in file.",
      "input_schema": {"type": "object", "properties": {"path": {"type": "string"}, "old_text": {"type": "string"}, "new_text": {"type": "string"}}, "required": ["path", "old_text", "new_text"]}},
 ]
+
+
+def agent_loop(messages: list):
+    while True:
+        response = client.messages.create(
+            model=MODEL, system=SYSTEM, messages=messages,
+            tools=TOOLS, max_tokens=8000,
+        )
+        messages.append({"role": "assistant", "content": response.content})
+        results = []
+        print(">>>", response)
+        if response.stop_reason != "tool_use":
+            return
+        for block in response.content:
+            if block.type == "tool_use":
+                handler = TOOL_HANDLERS.get(block.name)
+                output = handler(**block.input) if handler else f"Unknown tool: {block.name}"
+                # 等价于
+                # if handler:
+                #     output = handler(**block.input)
+                # else:
+                #     output = f"Unknown tool: {block.name}"
+                print(f"{block.name}: {output[:200]}")
+                # 之前写得tool_user_id，应该是tool_use_id，找半天原因
+                results.append({"type": "tool_result", "tool_use_id": block.id, "content": output})
+        messages.append({"role": "user", "content": results})
+
+
+if __name__ == '__main__':
+    messages = []
+    while True:
+        try:
+            query = input("请输入：")
+        except (EOFError, KeyboardInterrupt):
+            break
+        leave = ["q", "exit", "quit"]
+        if query.strip().lower() in leave:
+            break
+        if query.strip().lower() == "":
+            continue
+        init_message = {"role": "user", "content": query}
+        messages.append(init_message)
+        agent_loop(messages)
+        response_content = messages[-1]["content"]
+        if isinstance(response_content, list):
+            for block in response_content:
+                if hasattr(block, "text"):
+                    print(block.text)
+        print()
