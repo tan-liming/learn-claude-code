@@ -68,7 +68,7 @@ def run_bash(command: str) -> str:
 def agent_loop(messages: list):
     while True:
         response = client.messages.create(model=MODEL, max_tokens=8000, messages=messages, tools=TOOLS, system=SYSTEM)
-        print(response)
+        print(response.content["text"])
         messages.append({"role": "assistant", "content": response.content})
         if response.stop_reason == 'end_turn':
             return

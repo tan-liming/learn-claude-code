@@ -1,0 +1,20 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="Flask" />
+          <option value="waitress" />
+          <option value="absl-py" />
+          <option value="jieba" />
+          <option value="langdetect" />
+          <option value="nltk" />
+          <option value="requests" />
+          <option value="pandas" />
+          <option value="openpyxl" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
